@@ -1,0 +1,23 @@
+version: "3"
+services:
+  apirestful:
+    build: .
+    volumes:
+      - .:/var/www/html:delegated
+      - ./Docker/php/xdebug.ini:/etc/php/7.4/cli/conf.d/20-xdebug.ini:delegated
+      - ./Docker/php/php.ini:/etc/php/7.4/fpm/php.ini:delegated
+      - ./Docker/certs:/etc/nginx/certs
+    environment:
+      - VIRTUAL_HOST=apirestful.local
+      - VIRTUAL_PORT=443
+      - VIRTUAL_PROTO=https
+    command: >
+      sh -c '
+        /etc/init.d/nginx start && /etc/init.d/php7.4-fpm start
+        supervisord
+      '
+    container_name: apirestful.local
+networks:
+  default:
+    external:
+      name: nginx-proxy
